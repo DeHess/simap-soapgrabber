@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://notice.server.soap.common.exchange.autinform.de/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="SoapServerService" targetNamespace="http://notice.server.soap.common.exchange.autinform.de/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import schemaLocation="https://www.simap.ch:443/shabforms/soapserver?xsd=1" namespace="http://www.kps-consulting.com" />
+    </xsd:schema>
+    <xsd:schema>
+      <xsd:import schemaLocation="https://www.simap.ch:443/shabforms/soapserver?xsd=2" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+    </xsd:schema>
+    <xsd:schema>
+      <xsd:import schemaLocation="https://www.simap.ch:443/shabforms/soapserver?xsd=3" namespace="http://jaxb.dev.java.net/array" />
+    </xsd:schema>
+  </types>
+  <message name="getAuthentication" />
+  <message name="getAuthenticationResponse">
+    <part name="success" type="xsd:boolean" />
+  </message>
+  <message name="Fault">
+    <part xmlns:ns1="http://www.kps-consulting.com" name="fault" element="ns1:Fault" />
+  </message>
+  <message name="getNoticeXml">
+    <part name="docId" type="xsd:long" />
+  </message>
+  <message name="getNoticeXmlResponse">
+    <part name="noticeXml" type="xsd:string" />
+  </message>
+  <message name="getNoticeList">
+    <part name="publishDate" type="xsd:dateTime" />
+  </message>
+  <message name="getNoticeListResponse">
+    <part xmlns:ns2="http://jaxb.dev.java.net/array" name="noticeList" type="ns2:longArray" />
+  </message>
+  <message name="getNoticeListForCategory">
+    <part name="category" type="xsd:string" />
+    <part name="publishDate" type="xsd:dateTime" />
+  </message>
+  <message name="getNoticeListForCategoryResponse">
+    <part xmlns:ns3="http://jaxb.dev.java.net/array" name="noticeList" type="ns3:longArray" />
+  </message>
+  <message name="getSearchNoticeList">
+    <part name="searchXml" type="xsd:string" />
+  </message>
+  <message name="getSearchNoticeListResponse">
+    <part xmlns:ns4="http://jaxb.dev.java.net/array" name="noticeList" type="ns4:longArray" />
+  </message>
+  <message name="getSearchNoticeCount">
+    <part name="searchXml" type="xsd:string" />
+  </message>
+  <message name="getSearchNoticeCountResponse">
+    <part name="noticeList" type="xsd:string" />
+  </message>
+  <message name="getSearchNoticeXml">
+    <part name="searchXml" type="xsd:string" />
+    <part name="arg1" type="xsd:string" />
+  </message>
+  <message name="getSearchNoticeXmlResponse">
+    <part name="noticeList" type="xsd:string" />
+  </message>
+  <message name="getActualCantonNoticeListForCategoryWithStatus">
+    <part name="category" type="xsd:string" />
+    <part name="status" type="xsd:string" />
+  </message>
+  <message name="getActualCantonNoticeListForCategoryWithStatusResponse">
+    <part xmlns:ns5="http://jaxb.dev.java.net/array" name="noticeList" type="ns5:longArray" />
+  </message>
+  <message name="getActualCantonNoticeListForCategory">
+    <part name="category" type="xsd:string" />
+  </message>
+  <message name="getActualCantonNoticeListForCategoryResponse">
+    <part xmlns:ns6="http://jaxb.dev.java.net/array" name="noticeList" type="ns6:longArray" />
+  </message>
+  <message name="getActualCantonNoticeList" />
+  <message name="getActualCantonNoticeListResponse">
+    <part xmlns:ns7="http://jaxb.dev.java.net/array" name="noticeList" type="ns7:longArray" />
+  </message>
+  <message name="getPublishedNoticeList">
+    <part name="publishDate" type="xsd:dateTime" />
+  </message>
+  <message name="getPublishedNoticeListResponse">
+    <part xmlns:ns8="http://jaxb.dev.java.net/array" name="noticeList" type="ns8:longArray" />
+  </message>
+  <message name="getProviderFromNotice">
+    <part name="docId" type="xsd:long" />
+  </message>
+  <message name="getProviderFromNoticeResponse">
+    <part name="provider" type="tns:provider" />
+  </message>
+  <message name="getNoticeXmls">
+    <part name="publishDate" type="xsd:dateTime" />
+  </message>
+  <message name="getNoticeXmlsResponse">
+    <part name="noticeXmls" type="xsd:string" />
+  </message>
+  <message name="getNoticePdf">
+    <part name="docId" type="xsd:long" />
+  </message>
+  <message name="getNoticePdfResponse">
+    <part name="pdf" type="xsd:base64Binary" />
+  </message>
+  <message name="getNoticeListForSubscriber">
+    <part name="publishDate" type="xsd:dateTime" />
+    <part name="subscriptionId" type="xsd:int" />
+  </message>
+  <message name="getNoticeListForSubscriberResponse">
+    <part xmlns:ns9="http://jaxb.dev.java.net/array" name="noticeList" type="ns9:longArray" />
+  </message>
+  <message name="getNoticeListForSubscriberDateRange">
+    <part name="publishDateFrom" type="xsd:dateTime" />
+    <part name="publishDateTo" type="xsd:dateTime" />
+    <part name="subscriptionId" type="xsd:int" />
+  </message>
+  <message name="getNoticeListForSubscriberDateRangeResponse">
+    <part xmlns:ns10="http://jaxb.dev.java.net/array" name="noticeList" type="ns10:longArray" />
+  </message>
+  <message name="getNoticeListForCategoryWithStatus">
+    <part name="category" type="xsd:string" />
+    <part name="status" type="xsd:string" />
+    <part name="publishDate" type="xsd:dateTime" />
+  </message>
+  <message name="getNoticeListForCategoryWithStatusResponse">
+    <part xmlns:ns11="http://jaxb.dev.java.net/array" name="noticeList" type="ns11:longArray" />
+  </message>
+  <message name="getNoticeHtml">
+    <part name="docId" type="xsd:long" />
+  </message>
+  <message name="getNoticeHtmlResponse">
+    <part name="noticeHtml" type="xsd:string" />
+  </message>
+  <message name="getAttachment">
+    <part name="docId" type="xsd:long" />
+  </message>
+  <message name="getAttachmentResponse">
+    <part name="file" type="xsd:base64Binary" />
+  </message>
+  <portType name="SoapServer">
+    <operation name="getAuthentication">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getAuthenticationRequest" message="tns:getAuthentication" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getAuthenticationResponse" message="tns:getAuthenticationResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getAuthentication/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeXml">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeXmlRequest" message="tns:getNoticeXml" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeXmlResponse" message="tns:getNoticeXmlResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeXml/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeList">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListRequest" message="tns:getNoticeList" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListResponse" message="tns:getNoticeListResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeList/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeListForCategory" parameterOrder="category publishDate">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForCategoryRequest" message="tns:getNoticeListForCategory" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForCategoryResponse" message="tns:getNoticeListForCategoryResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForCategory/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getSearchNoticeList">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeListRequest" message="tns:getSearchNoticeList" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeListResponse" message="tns:getSearchNoticeListResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeList/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getSearchNoticeCount">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeCountRequest" message="tns:getSearchNoticeCount" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeCountResponse" message="tns:getSearchNoticeCountResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeCount/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getSearchNoticeXml" parameterOrder="searchXml arg1">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeXmlRequest" message="tns:getSearchNoticeXml" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeXmlResponse" message="tns:getSearchNoticeXmlResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getSearchNoticeXml/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getActualCantonNoticeListForCategoryWithStatus" parameterOrder="category status">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListForCategoryWithStatusRequest" message="tns:getActualCantonNoticeListForCategoryWithStatus" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListForCategoryWithStatusResponse" message="tns:getActualCantonNoticeListForCategoryWithStatusResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListForCategoryWithStatus/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getActualCantonNoticeListForCategory">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListForCategoryRequest" message="tns:getActualCantonNoticeListForCategory" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListForCategoryResponse" message="tns:getActualCantonNoticeListForCategoryResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListForCategory/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getActualCantonNoticeList">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListRequest" message="tns:getActualCantonNoticeList" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeListResponse" message="tns:getActualCantonNoticeListResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getActualCantonNoticeList/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getPublishedNoticeList">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getPublishedNoticeListRequest" message="tns:getPublishedNoticeList" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getPublishedNoticeListResponse" message="tns:getPublishedNoticeListResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getPublishedNoticeList/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getProviderFromNotice">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getProviderFromNoticeRequest" message="tns:getProviderFromNotice" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getProviderFromNoticeResponse" message="tns:getProviderFromNoticeResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getProviderFromNotice/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeXmls">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeXmlsRequest" message="tns:getNoticeXmls" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeXmlsResponse" message="tns:getNoticeXmlsResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeXmls/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticePdf">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticePdfRequest" message="tns:getNoticePdf" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticePdfResponse" message="tns:getNoticePdfResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticePdf/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeListForSubscriber" parameterOrder="publishDate subscriptionId">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForSubscriberRequest" message="tns:getNoticeListForSubscriber" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForSubscriberResponse" message="tns:getNoticeListForSubscriberResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForSubscriber/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeListForSubscriberDateRange" parameterOrder="publishDateFrom publishDateTo subscriptionId">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForSubscriberDateRangeRequest" message="tns:getNoticeListForSubscriberDateRange" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForSubscriberDateRangeResponse" message="tns:getNoticeListForSubscriberDateRangeResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForSubscriberDateRange/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeListForCategoryWithStatus" parameterOrder="category status publishDate">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForCategoryWithStatusRequest" message="tns:getNoticeListForCategoryWithStatus" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForCategoryWithStatusResponse" message="tns:getNoticeListForCategoryWithStatusResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeListForCategoryWithStatus/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getNoticeHtml">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeHtmlRequest" message="tns:getNoticeHtml" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeHtmlResponse" message="tns:getNoticeHtmlResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getNoticeHtml/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+    <operation name="getAttachment">
+      <input wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getAttachmentRequest" message="tns:getAttachment" />
+      <output wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getAttachmentResponse" message="tns:getAttachmentResponse" />
+      <fault wsam:Action="http://notice.server.soap.common.exchange.autinform.de/SoapServer/getAttachment/Fault/Fault" name="Fault" message="tns:Fault" />
+    </operation>
+  </portType>
+  <binding name="SoapServerPortBinding" type="tns:SoapServer">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <operation name="getAuthentication">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeXml">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeList">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeListForCategory">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getSearchNoticeList">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getSearchNoticeCount">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getSearchNoticeXml">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getActualCantonNoticeListForCategoryWithStatus">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getActualCantonNoticeListForCategory">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getActualCantonNoticeList">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getPublishedNoticeList">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getProviderFromNotice">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeXmls">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticePdf">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeListForSubscriber">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeListForSubscriberDateRange">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeListForCategoryWithStatus">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getNoticeHtml">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+    <operation name="getAttachment">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </input>
+      <output>
+        <soap:body use="literal" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+      </output>
+      <fault name="Fault">
+        <soap:fault use="literal" name="Fault" namespace="" />
+      </fault>
+    </operation>
+  </binding>
+  <service name="SoapServerService">
+    <port name="SoapServerPort" binding="tns:SoapServerPortBinding">
+      <soap:address location="https://www.simap.ch:443/shabforms/soapserver" />
+    </port>
+  </service>
+</definitions>

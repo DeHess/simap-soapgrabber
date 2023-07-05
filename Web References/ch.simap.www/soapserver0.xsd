@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:ns1="http://notice.server.soap.common.exchange.autinform.de/" targetNamespace="http://www.kps-consulting.com" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="https://www.simap.ch:443/shabforms/soapserver?xsd=2" namespace="http://notice.server.soap.common.exchange.autinform.de/" />
+  <xs:element name="Fault" nillable="true" type="ns1:faultDetail" />
+</xs:schema>

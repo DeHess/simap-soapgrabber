@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://notice.server.soap.common.exchange.autinform.de/" targetNamespace="http://notice.server.soap.common.exchange.autinform.de/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="faultDetail">
+    <xs:sequence>
+      <xs:element name="code" type="xs:int" />
+      <xs:element minOccurs="0" name="message" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="provider">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="authentificationProfile" type="tns:authentificationProfile" />
+      <xs:element minOccurs="0" name="contactProfile" type="tns:contactProfile" />
+      <xs:element minOccurs="0" name="creation" type="xs:dateTime" />
+      <xs:element name="id" type="xs:int" />
+      <xs:element minOccurs="0" name="lastupdated" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="lastupdatedFrom" type="xs:string" />
+      <xs:element minOccurs="0" name="providerComment" type="xs:string" />
+      <xs:element minOccurs="0" name="userProfile" type="tns:userProfile" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="authentificationProfile">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="authentication" type="tns:authentication" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="categoriesAuthorised" nillable="true" type="tns:category" />
+      <xs:element minOccurs="0" name="category" type="tns:category" />
+      <xs:element minOccurs="0" name="categoryCode" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="categoryCodeList" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="language" type="tns:language" />
+      <xs:element minOccurs="0" name="languageCode" type="xs:string" />
+      <xs:element minOccurs="0" name="login" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element name="role" type="xs:int" />
+      <xs:element minOccurs="0" name="status" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="authentication">
+    <xs:sequence>
+      <xs:element name="addNewFields" type="xs:boolean" />
+      <xs:element name="asUserID" type="xs:long" />
+      <xs:element minOccurs="0" name="asUserName" type="xs:string" />
+      <xs:element minOccurs="0" name="asUserRedirect" type="xs:string" />
+      <xs:element minOccurs="0" name="canton" type="xs:string" />
+      <xs:element minOccurs="0" name="category" type="xs:string" />
+      <xs:element minOccurs="0" name="companyEnabled" type="xs:string" />
+      <xs:element name="companyId" type="xs:long" />
+      <xs:element minOccurs="0" name="contractorEnabled" type="xs:string" />
+      <xs:element name="contractorRoleId" type="xs:int" />
+      <xs:element minOccurs="0" name="enableYN" type="xs:string" />
+      <xs:element name="highlightedTopNavigation" type="xs:int" />
+      <xs:element minOccurs="0" name="language" type="xs:string" />
+      <xs:element name="loggedIn" type="xs:boolean" />
+      <xs:element name="loginError" type="xs:boolean" />
+      <xs:element name="loginTries" type="xs:int" />
+      <xs:element minOccurs="0" name="mailAdress" type="xs:string" />
+      <xs:element minOccurs="0" name="mobileNumber" type="xs:string" />
+      <xs:element name="mustGTCaccepted" type="xs:boolean" />
+      <xs:element minOccurs="0" name="natureUser" type="xs:string" />
+      <xs:element minOccurs="0" name="navigationPage" type="xs:string" />
+      <xs:element minOccurs="0" name="selectedLanguage" type="xs:string" />
+      <xs:element minOccurs="0" name="step2Password" type="xs:string" />
+      <xs:element name="type" type="xs:int" />
+      <xs:element name="userID" type="xs:long" />
+      <xs:element minOccurs="0" name="userName" type="xs:string" />
+      <xs:element minOccurs="0" name="userPassword" type="xs:string" />
+      <xs:element minOccurs="0" name="userRedirect" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="category">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="catCD" type="xs:string" />
+      <xs:element minOccurs="0" name="DE" type="xs:string" />
+      <xs:element minOccurs="0" name="EN" type="xs:string" />
+      <xs:element minOccurs="0" name="FR" type="xs:string" />
+      <xs:element minOccurs="0" name="IT" type="xs:string" />
+      <xs:element minOccurs="0" name="internal" type="xs:string" />
+      <xs:element minOccurs="0" name="order" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="typeList" nillable="true" type="tns:type" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="type">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="addType" type="xs:string" />
+      <xs:element minOccurs="0" name="category" type="xs:string" />
+      <xs:element minOccurs="0" name="descriptionDE" type="xs:string" />
+      <xs:element minOccurs="0" name="descriptionEN" type="xs:string" />
+      <xs:element minOccurs="0" name="descriptionFR" type="xs:string" />
+      <xs:element minOccurs="0" name="descriptionIT" type="xs:string" />
+      <xs:element minOccurs="0" name="initDocument" type="xs:string" />
+      <xs:element minOccurs="0" name="type" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="language">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="documentation" type="xs:string" />
+      <xs:element minOccurs="0" name="firstCode" type="xs:string" />
+      <xs:element name="id" type="xs:int" />
+      <xs:element minOccurs="0" name="name" type="xs:string" />
+      <xs:element minOccurs="0" name="secondCode" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="contactProfile">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="cantonLegal" type="xs:string" />
+      <xs:element minOccurs="0" name="cantonPrivateYN" type="xs:string" />
+      <xs:element minOccurs="0" name="firstName" type="xs:string" />
+      <xs:element minOccurs="0" name="information" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceAddress" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceAddressSupplement" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceCity" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceCountry" type="tns:country" />
+      <xs:element minOccurs="0" name="invoiceCountryCode" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceFax" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceFirstName" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceLastName" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceMail" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceOrganisation" type="xs:string" />
+      <xs:element minOccurs="0" name="invoicePhone" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceSalutation" type="xs:string" />
+      <xs:element minOccurs="0" name="invoiceZipCode" type="xs:string" />
+      <xs:element minOccurs="0" name="lastName" type="xs:string" />
+      <xs:element minOccurs="0" name="mail" type="xs:string" />
+      <xs:element minOccurs="0" name="newCantonMode" type="xs:string" />
+      <xs:element minOccurs="0" name="oldCantonMode" type="xs:string" />
+      <xs:element minOccurs="0" name="phone" type="xs:string" />
+      <xs:element minOccurs="0" name="salutation" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="country">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="code" type="xs:string" />
+      <xs:element name="id" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="userProfile">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="address" type="xs:string" />
+      <xs:element minOccurs="0" name="addressSupplement" type="xs:string" />
+      <xs:element minOccurs="0" name="authDemand" type="xs:string" />
+      <xs:element minOccurs="0" name="authorityTed" type="xs:string" />
+      <xs:element minOccurs="0" name="authorityTedOther" type="xs:string" />
+      <xs:element minOccurs="0" name="authorityType" type="xs:string" />
+      <xs:element minOccurs="0" name="canton" type="tns:canton" />
+      <xs:element minOccurs="0" name="cantonCode" type="xs:string" />
+      <xs:element minOccurs="0" name="cantonExport" type="xs:string" />
+      <xs:element minOccurs="0" name="city" type="xs:string" />
+      <xs:element minOccurs="0" name="cityCode" type="xs:string" />
+      <xs:element minOccurs="0" name="country" type="tns:country" />
+      <xs:element minOccurs="0" name="countryCode" type="xs:string" />
+      <xs:element minOccurs="0" name="fax" type="xs:string" />
+      <xs:element minOccurs="0" name="federalInstitution" type="tns:federalInstitution" />
+      <xs:element minOccurs="0" name="federalInstitutionId" type="xs:string" />
+      <xs:element minOccurs="0" name="mail" type="xs:string" />
+      <xs:element minOccurs="0" name="municipality" type="tns:municipality" />
+      <xs:element minOccurs="0" name="name" type="xs:string" />
+      <xs:element minOccurs="0" name="phone" type="xs:string" />
+      <xs:element minOccurs="0" name="type" type="tns:authorityType" />
+      <xs:element minOccurs="0" name="url" type="xs:string" />
+      <xs:element minOccurs="0" name="zipCode" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="canton">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="code" type="xs:string" />
+      <xs:element name="id" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="federalInstitution">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="authority" type="xs:string" />
+      <xs:element minOccurs="0" name="cantonCode" type="xs:string" />
+      <xs:element minOccurs="0" name="dictionaryKey" type="xs:string" />
+      <xs:element name="id" type="xs:int" />
+      <xs:element name="parentId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="municipality">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="code" type="xs:string" />
+      <xs:element name="id" type="xs:int" />
+      <xs:element minOccurs="0" name="image" type="xs:string" />
+      <xs:element minOccurs="0" name="key" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="authorityType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="category" type="xs:string" />
+      <xs:element minOccurs="0" name="code" type="xs:string" />
+      <xs:element name="id" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
