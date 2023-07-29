@@ -1,5 +1,5 @@
 # simap-soapgrabber
-This is a little #C application that uses the simap Webserver / API to get data from the swiss public procurement platform [SIMAP](https://simap.ch/shabforms/COMMON/application/applicationGrid.jsp?template=1&view=1&page=/MULTILANGUAGE/simap/content/start.jsp&language=EN)
+This is a little #C application that uses the simap Webserver / API to get data from the swiss public procurement platform [SIMAP](https://simap.ch/shabforms/COMMON/application/applicationGrid.jsp?template=1&view=1&page=/MULTILANGUAGE/simap/content/start.jsp&language=EN){:target="_blank"}
 
 # Soap Usage Guide
 For others of my generation who have the honor of working with soap and who have to generate classes through wsdl, this is how I managed to make it work:
