@@ -104,7 +104,8 @@ namespace WindowsFormsApp1
 
             //Write to File
             string filePath = "idList.csv";
-
+            WriteListToCsv(idList, filePath);
+            Console.WriteLine("Data has been written to the CSV file.");
         }
     }
 }
