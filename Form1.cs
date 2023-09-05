@@ -47,7 +47,6 @@ namespace WindowsFormsApp1
             
             List<Int64> idList = new List<Int64>();
 
-            //There are no 
             int startYear = 2000;
 
             DateTime endDate = DateTime.Now.Date;
@@ -75,7 +74,7 @@ namespace WindowsFormsApp1
                     string startDateFormatted = startOfTimespan.ToString("dd.MM.yyyy");
                     string endDateFormmatted = endOfTimeSpan.ToString("dd.MM.yyyy");
 
-                    Console.WriteLine(startOfTimespan + " - " + endDateFormmatted);
+                    
 
                     try
                     {
@@ -86,16 +85,18 @@ namespace WindowsFormsApp1
                         //Less than a thousand notices in current month
                         if (noticeIds.Length < 1000)
                         {
+                            Console.WriteLine(startOfTimespan + " - " + endDateFormmatted + " -- " + noticeIds.Length + " Notices");
                             foreach (long id in noticeIds)
                             {
                                 idList.Add(id);
                             }
                         }
                         
+
                         //A thousand or more notices in current month:
                         else
                         {
-                            Console.Write("More than 1000 Notices in " + year + "." + month + "! Switching to Daily Mode");
+                            Console.WriteLine("More than 1000 Notices in month " + month + " of " + year + "! Switching to Daily Mode");
                             int daysInMonth = DateTime.DaysInMonth(year, month);
                             for (int day = 1; day <= daysInMonth; day++)
                             {
@@ -106,6 +107,10 @@ namespace WindowsFormsApp1
                   "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
 
                                 long?[] dayNoticeIds = client.getSearchNoticeList(daySearchXML);
+                                Console.WriteLine(currentDateFormatted + " -- " + dayNoticeIds.Length + " Notices");
+                                if (dayNoticeIds.Length > 1000) {
+                                    MessageBox.Show("Data Loss due to more than 1000 Notices during the day of" + currentDateFormatted + "!!!!");
+                                }
                                 foreach (long id in dayNoticeIds)
                                 {
                                     idList.Add(id);
