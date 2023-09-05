@@ -20,3 +20,13 @@ C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsForm
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.exe
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.pdb
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\bin\Debug\WindowsFormsApp1.exe.config
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\bin\Debug\WindowsFormsApp1.exe
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\bin\Debug\WindowsFormsApp1.pdb
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.csproj.AssemblyReference.cache
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.Form1.resources
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.Properties.Resources.resources
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.csproj.GenerateResource.cache
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.exe
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.pdb
