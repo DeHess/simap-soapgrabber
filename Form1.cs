@@ -33,7 +33,7 @@ namespace WindowsFormsApp1
             List<Int64> idList = new List<Int64>();
             
             Boolean finished = false;
-            int counter = 0;
+            int counter = 1;
             while (!finished) {
 
                 string searchXML = "<search pageNo=\"" + counter + "\" recordsPerPage=\"1000\">" +
@@ -43,19 +43,27 @@ namespace WindowsFormsApp1
                 try
                 {
                     long?[] pageContent = client.getSearchNoticeList(searchXML);
-                    MessageBox.Show("Type: " + pageContent.ToString() + "Length: " + pageContent.Length);
+                    foreach (long id in pageContent)
+                    {
+                        idList.Add(id);
+                    }
+
+                    //MessageBox.Show("Type: " + pageContent.ToString() + "Length: " + pageContent.Length);
                 }
                 catch (Exception ex)
                 {
                     finished = true;
-                    MessageBox.Show(ex.ToString());
+                    //MessageBox.Show(ex.ToString());
                 }
 
                 counter++;
+                if (counter == 10) {
+                    finished = true;
+                }
             }
 
-            
-            
+
+            MessageBox.Show("Length of idList: " + idList.Count);
 
 
         }
