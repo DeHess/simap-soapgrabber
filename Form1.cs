@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -28,43 +29,81 @@ namespace WindowsFormsApp1
 
         }
 
+        static void WriteListToCsv(List<Int64> list, string filePath) {
+            try {
+                using (StreamWriter sw = new StreamWriter(filePath)) {
+                    foreach (var item in list) {
+                        sw.WriteLine(item);
+                    }
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            List<Int64> idList = new List<Int64>();
             
-            Boolean finished = false;
-            int counter = 1;
+            List<Int64> idList = new List<Int64>();
+
+            int startYear = 2000;
+
+            DateTime endDate = DateTime.Now.Date;
+
+            //Iterate over years between 2000 and endYear
+            bool finished = false;
+            int year = startYear;
             while (!finished) {
-
-                string searchXML = "<search pageNo=\"" + counter + "\" recordsPerPage=\"1000\">" +
-                  "<field name=\"STAT_TM_1\"><value>01.01.2000</value></field><field name=\"STAT_TM_2\"><value>01.01.2023</value></field></search>";
-
-
-                try
-                {
-                    long?[] pageContent = client.getSearchNoticeList(searchXML);
-                    foreach (long id in pageContent)
+                //Iterate over Months in each year
+                for (int month = 1; month <= 12; month++) {
+                    int daysInMonth = DateTime.DaysInMonth(year, month);
+                    
+                    //Iterate over each Day in each Month
+                    for (int day = 1; day <= daysInMonth; day++)
                     {
-                        idList.Add(id);
+                        DateTime date = new DateTime(year, month, day);
+                        string formattedDate = date.ToString("dd.MM.yyyy");
+                        
+                        if (date == endDate) {
+                            finished = true;
+                        }
+   
+                        Console.WriteLine(date);
+
+                        //Get Notice ID's of the current day:
+                        try
+                        {
+                            string searchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                  "<field name=\"STAT_TM_1\"><value>"+ formattedDate +"</value></field></search>";
+                            long?[] noticeIds = client.getSearchNoticeList(searchXML);
+                            foreach (long id in noticeIds)
+                            {
+                                idList.Add(id);
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.ToString());
+                        }
+
+
+                        if (finished) { break; }
                     }
-
-                    //MessageBox.Show("Type: " + pageContent.ToString() + "Length: " + pageContent.Length);
+                    if (finished) { break; }
                 }
-                catch (Exception ex)
-                {
-                    finished = true;
-                    //MessageBox.Show(ex.ToString());
-                }
-
-                counter++;
-                if (counter == 10) {
-                    finished = true;
-                }
+                
+                //Update Year
+                year++;
             }
 
 
+            //Show Results!!!
             MessageBox.Show("Length of idList: " + idList.Count);
 
+            //Write to File
+            string filePath = "idList.csv";
 
         }
     }
