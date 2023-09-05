@@ -47,6 +47,7 @@ namespace WindowsFormsApp1
             
             List<Int64> idList = new List<Int64>();
 
+            //There are no 
             int startYear = 2000;
 
             DateTime endDate = DateTime.Now.Date;
@@ -54,44 +55,82 @@ namespace WindowsFormsApp1
             //Iterate over years between 2000 and endYear
             bool finished = false;
             int year = startYear;
+            
             while (!finished) {
                 //Iterate over Months in each year
                 for (int month = 1; month <= 12; month++) {
-                    int daysInMonth = DateTime.DaysInMonth(year, month);
                     
-                    //Iterate over each Day in each Month
-                    for (int day = 1; day <= daysInMonth; day++)
-                    {
-                        DateTime date = new DateTime(year, month, day);
-                        string formattedDate = date.ToString("dd.MM.yyyy");
-                        
-                        if (date == endDate) {
-                            finished = true;
-                        }
-   
-                        Console.WriteLine(date);
+                    //Start of the month
+                    DateTime startOfTimespan = new DateTime(year, month, 1);
+                    
+                    //End of the Month
+                    DateTime endOfTimeSpan = startOfTimespan.AddMonths(1).AddDays(-1);
 
-                        //Get Notice ID's of the current day:
-                        try
+                    //End Reached
+                    if (endOfTimeSpan >= endDate) {
+                        endOfTimeSpan = endDate;
+                        finished = true;
+                    }
+
+                    string startDateFormatted = startOfTimespan.ToString("dd.MM.yyyy");
+                    string endDateFormmatted = endOfTimeSpan.ToString("dd.MM.yyyy");
+
+                    Console.WriteLine(startOfTimespan + " - " + endDateFormmatted);
+
+                    try
+                    {
+                        string searchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+              "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></search>";
+                        long?[] noticeIds = client.getSearchNoticeList(searchXML);
+
+                        //Less than a thousand notices in current month
+                        if (noticeIds.Length < 1000)
                         {
-                            string searchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                  "<field name=\"STAT_TM_1\"><value>"+ formattedDate +"</value></field></search>";
-                            long?[] noticeIds = client.getSearchNoticeList(searchXML);
                             foreach (long id in noticeIds)
                             {
                                 idList.Add(id);
                             }
-
                         }
-                        catch (Exception ex)
+                        
+                        //A thousand or more notices in current month:
+                        else
                         {
-                            MessageBox.Show(ex.ToString());
+                            Console.Write("More than 1000 Notices in " + year + "." + month + "! Switching to Daily Mode");
+                            int daysInMonth = DateTime.DaysInMonth(year, month);
+                            for (int day = 1; day <= daysInMonth; day++)
+                            {
+
+                                DateTime currentDate = new DateTime(year, month, day);
+                                string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
+                                string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                  "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
+
+                                long?[] dayNoticeIds = client.getSearchNoticeList(daySearchXML);
+                                foreach (long id in dayNoticeIds)
+                                {
+                                    idList.Add(id);
+                                }
+
+
+                                if (currentDate == endDate)
+                                {
+                                    finished = true;
+                                    break;
+                                }
+
+                            }
+
                         }
 
-
-                        if (finished) { break; }
                     }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
+
                     if (finished) { break; }
+                    
+                if (finished) { break; }
                 }
                 
                 //Update Year
