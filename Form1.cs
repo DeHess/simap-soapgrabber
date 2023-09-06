@@ -49,7 +49,7 @@ namespace WindowsFormsApp1
             idGatheringFinished = false;
             idList = new List<Int64>();
 
-            int startYear = 2000;
+            int startYear = 2023;
             DateTime endDate = DateTime.Now.Date;
 
             //Iterate over years between 2000 and endYear
@@ -66,27 +66,20 @@ namespace WindowsFormsApp1
                         int daysInMonth = DateTime.DaysInMonth(year, month);
                         for (int day = 1; day <= daysInMonth; day++)
                         {
-                            DateTime currentDate = new DateTime(year, month, day);
-                            string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
-                            string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
-
-                            long?[] dayNoticeIds = client.getSearchNoticeList(daySearchXML);
+                            
+                            long?[] dayNoticeIds = getDayNoticeIds(year, month, day, endDate);
+                            
+                            
                             Console.WriteLine("Daily Mode: " + day + "." + month + "." + year + " - " + dayNoticeIds.Length + " Notices");
-                            if (dayNoticeIds.Length > 1000) {
-                                MessageBox.Show("DATA LOSS: There were more than 1000 Notices during the day of" + currentDateFormatted + "!!!!");
+                            
+                            if (dayNoticeIds.Length > NOTICELISTLIMIT) {
+                                MessageBox.Show("DATA LOSS: There were more than 1000 Notices during the day of" + day + "." + month + "." + year + "!!!!");
                             }
-                            foreach (long id in dayNoticeIds)
-                            {
+                            foreach (long id in dayNoticeIds) {
                                 idList.Add(id);
                             }
 
-
-                            if (currentDate == endDate)
-                            {
-                                idGatheringFinished = true;
-                                break;
-                            }
+                            if (idGatheringFinished) { break; }
 
                         }
 
@@ -95,18 +88,30 @@ namespace WindowsFormsApp1
                 if (idGatheringFinished) { break; }
                 }
                 
-                //Update Year
                 year++;
             }
 
-
-            //Show Results!!!
-            MessageBox.Show("Length of idList: " + idList.Count);
 
             //Write to File
             string filePath = "idList.csv";
             WriteIDsToCsv(idList, filePath);
             Console.WriteLine("Data has been written to the CSV file.");
+        }
+
+        private long?[] getDayNoticeIds(int year, int month, int day, DateTime endDate)
+        {
+            
+            DateTime currentDate = new DateTime(year, month, day);
+            if (currentDate == endDate) { 
+                idGatheringFinished = true;
+            }
+
+
+            string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
+            string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+"<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
+
+            return client.getSearchNoticeList(daySearchXML);
         }
 
         private void addMonthlyIDsToList(int year, int month, long?[] monthNoticeIds)
