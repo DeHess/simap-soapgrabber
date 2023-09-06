@@ -17,8 +17,10 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
+        private const int NOTICELISTLIMIT = 1000;
         SoapServerService client = new SoapServerService();
         bool idGatheringFinished = false;
+        List<Int64> idList = new List<Int64>();
 
         public Form1()
         {
@@ -45,63 +47,34 @@ namespace WindowsFormsApp1
 
         private void grabIDList(object sender, EventArgs e) {
             idGatheringFinished = false;
-            List<Int64> idList = new List<Int64>();
+            idList = new List<Int64>();
 
             int startYear = 2000;
             DateTime endDate = DateTime.Now.Date;
 
             //Iterate over years between 2000 and endYear
-
             int year = startYear;
-            
             while (!idGatheringFinished) {
-                //Iterate over Months in each year
                 for (int month = 1; month <= 12; month++) {
                     
-                    //Start of the month
-                    DateTime startOfTimespan = new DateTime(year, month, 1);
-                
-                    //End of the Month
-                    DateTime endOfTimeSpan = startOfTimespan.AddMonths(1).AddDays(-1);
-
-                    //End Reached
-                    if (endOfTimeSpan >= endDate) {
-                        endOfTimeSpan = endDate;
-                        idGatheringFinished = true;
+                    long?[] monthNoticeIds = getMonthlyIds(year, month, endDate);
+                    if (monthNoticeIds.Length < NOTICELISTLIMIT) {
+                        addMonthlyIDsToList(year, month, monthNoticeIds);
                     }
 
-                    string startDateFormatted = startOfTimespan.ToString("dd.MM.yyyy");
-                    string endDateFormmatted = endOfTimeSpan.ToString("dd.MM.yyyy");
-
-                    string searchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-            "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></search>";
-                    long?[] monthNoticeIds = client.getSearchNoticeList(searchXML);
-
-                    //Less than a thousand notices in current month
-                    if (monthNoticeIds.Length < 1000) {
-                        Console.WriteLine(startOfTimespan + " - " + endDateFormmatted + " -- " + monthNoticeIds.Length + " Notices");
-                        foreach (long id in monthNoticeIds) {
-                            idList.Add(id);
-                        }
-                    }
-                        
-
-                    //A thousand or more notices in current month:
-                    else {
-                        Console.WriteLine("More than 1000 Notices in month " + month + " of " + year + "! Switching to Daily Mode");
+                    if (monthNoticeIds.Length >= NOTICELISTLIMIT) {
                         int daysInMonth = DateTime.DaysInMonth(year, month);
                         for (int day = 1; day <= daysInMonth; day++)
                         {
-
                             DateTime currentDate = new DateTime(year, month, day);
                             string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
                             string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
                 "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
 
                             long?[] dayNoticeIds = client.getSearchNoticeList(daySearchXML);
-                            Console.WriteLine(currentDateFormatted + " -- " + dayNoticeIds.Length + " Notices");
+                            Console.WriteLine("Daily Mode: " + day + "." + month + "." + year + " - " + dayNoticeIds.Length + " Notices");
                             if (dayNoticeIds.Length > 1000) {
-                                MessageBox.Show("Data Loss due to more than 1000 Notices during the day of" + currentDateFormatted + "!!!!");
+                                MessageBox.Show("DATA LOSS: There were more than 1000 Notices during the day of" + currentDateFormatted + "!!!!");
                             }
                             foreach (long id in dayNoticeIds)
                             {
@@ -118,10 +91,6 @@ namespace WindowsFormsApp1
                         }
 
                     }
-
-
-
-                    if (idGatheringFinished) { break; }
                     
                 if (idGatheringFinished) { break; }
                 }
@@ -138,6 +107,33 @@ namespace WindowsFormsApp1
             string filePath = "idList.csv";
             WriteIDsToCsv(idList, filePath);
             Console.WriteLine("Data has been written to the CSV file.");
+        }
+
+        private void addMonthlyIDsToList(int year, int month, long?[] monthNoticeIds)
+        {
+            Console.WriteLine("Monthly Mode: " + month + "." + year + " - " + monthNoticeIds.Length + " Notices");
+            foreach (long id in monthNoticeIds)
+            {
+                idList.Add(id);
+            }
+        }
+
+        private long?[] getMonthlyIds(int year, int month, DateTime endDate) {
+
+            DateTime startOfMonth = new DateTime(year, month, 1);
+            DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+
+            if (endOfMonth >= endDate) {
+                endOfMonth = endDate;
+                idGatheringFinished = true;
+            }
+
+            string startDateFormatted = startOfMonth.ToString("dd.MM.yyyy");
+            string endDateFormmatted = endOfMonth.ToString("dd.MM.yyyy");
+
+            string searchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+    "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></search>";
+            return client.getSearchNoticeList(searchXML);
         }
     }
 }
