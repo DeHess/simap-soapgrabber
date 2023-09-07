@@ -14,6 +14,7 @@ using WindowsFormsApp1.ch.simap.www;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace WindowsFormsApp1
@@ -138,7 +139,7 @@ namespace WindowsFormsApp1
                 }
             } 
             catch (Exception ex) {
-                Console.WriteLine("An error occurred: " + ex.Message);
+                MessageBox.Show("An error occurred: " + ex.Message);
             }
         }
 
@@ -158,35 +159,43 @@ namespace WindowsFormsApp1
                 string notice = client.getNoticeHtml(id);
                 HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                 doc.LoadHtml(notice);
-
-                string date = getNoticeDate(doc, id);
-
+                HtmlNodeCollection dlElements = doc.DocumentNode.SelectNodes("//dl");
+                string date = getNoticeDate(dlElements, id);
+                string authority = getNoticeAuthority(dlElements, id);
                 
 
 
 
 
                 //var d = doc.DocumentNode.SelectNodes("//h2");
-                //Console.WriteLine(d.Count);
+                Console.WriteLine("==================================");
 
             }
         }
 
-        private string getNoticeDate(HtmlAgilityPack.HtmlDocument doc, long id) {
-            HtmlNode firstDl = doc.DocumentNode.SelectSingleNode("//dl");
-            if (firstDl != null) {
-                string innerHtml = firstDl.InnerHtml;
-                string pattern = @"\b\d{2}\.\d{2}\.\d{4}\b";
-                Match match = Regex.Match(innerHtml, pattern);
-                if (match.Success) {
-                    string firstDate = match.Value;
-                    Console.WriteLine("Date: " + firstDate);
-                    return firstDate;
-                }
-                
+        private string getNoticeAuthority(HtmlNodeCollection dlElements, int id) {
+            HtmlNode authoritydl = dlElements[1];
+            HtmlNodeCollection spans = authoritydl.SelectNodes("//span");
+            HtmlNode authoritySpan = spans[1];
+            string value = authoritySpan.NextSibling.InnerText;
+
+            Console.WriteLine("Authority: " + value);
+            return value;
+        }
+
+        private string getNoticeDate(HtmlNodeCollection dlElements, long id) {
+            HtmlNode dateDl = dlElements[0];
+            
+            string innerHtml = dateDl.InnerHtml;
+            string pattern = @"\b\d{2}\.\d{2}\.\d{4}\b";
+            Match match = Regex.Match(innerHtml, pattern);
+            if (match.Success) {
+                string date = match.Value;
+                Console.WriteLine("Date: " + date);
+                return date;
             }
             else {
-                MessageBox.Show("No d1 Element found in html of " + id + ", no date discovered!");
+                MessageBox.Show("Notice " + id + ": no date discovered!");
             }
             return "";
         }
