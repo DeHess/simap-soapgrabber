@@ -12,29 +12,30 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using WindowsFormsApp1.ch.simap.www;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using HtmlAgilityPack;
+using System.Text.RegularExpressions;
+
 
 namespace WindowsFormsApp1
 {
-    public partial class Form1 : Form
-    {
+    public partial class Form1 : Form {
+
         private const int NOTICELISTLIMIT = 1000;
         SoapServerService client = new SoapServerService();
         bool idGatheringFinished = false;
         List<Int64> idList = new List<Int64>();
 
-        public Form1()
-        {
+        public Form1() {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
+        private void Form1_Load(object sender, EventArgs e) {
 
         }
 
 
 
-        private void grabIDList(object sender, EventArgs e) {
+        private void GrabIDList(object sender, EventArgs e) {
             idGatheringFinished = false;
             idList = new List<Int64>();
 
@@ -46,9 +47,9 @@ namespace WindowsFormsApp1
             while (!idGatheringFinished) {
                 for (int month = 1; month <= 12; month++) {
                     
-                    long?[] monthNoticeIds = getMonthlyIds(year, month, endDate);
+                    long?[] monthNoticeIds = GetMonthlyIds(year, month, endDate);
                     if (monthNoticeIds.Length < NOTICELISTLIMIT) {
-                        addMonthlyIDsToList(year, month, monthNoticeIds);
+                        AddMonthlyIDsToList(year, month, monthNoticeIds);
                     }
 
                     if (monthNoticeIds.Length >= NOTICELISTLIMIT) {
@@ -56,13 +57,13 @@ namespace WindowsFormsApp1
                         for (int day = 1; day <= daysInMonth; day++)
                         {
                             
-                            long?[] dayNoticeIds = getDayNoticeIds(year, month, day, endDate);
+                            long?[] dayNoticeIds = GetDayNoticeIds(year, month, day, endDate);
                                     
                             if (dayNoticeIds.Length > NOTICELISTLIMIT) {
                                 //This does not ever occur (6.9.2023)
                                 MessageBox.Show("DATA LOSS: There were more than 1000 Notices during the day of" + day + "." + month + "." + year + "!!!!");
                             }
-                            addDayIDsToList(year, month, day, dayNoticeIds);
+                            AddDayIDsToList(year, month, day, dayNoticeIds);
 
                             if (idGatheringFinished) { break;}
                         }
@@ -77,44 +78,39 @@ namespace WindowsFormsApp1
         }
 
 
-        private long?[] getDayNoticeIds(int year, int month, int day, DateTime endDate)
-        {
+        private long?[] GetDayNoticeIds(int year, int month, int day, DateTime endDate) {
             
             DateTime currentDate = new DateTime(year, month, day);
             if (currentDate == endDate) { 
                 idGatheringFinished = true;
             }
 
-
             string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
             string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-"<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
+                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
 
             return client.getSearchNoticeList(daySearchXML);
         }
 
 
-        private void addDayIDsToList(int year, int month, int day, long?[] dayNoticeIds) {
+        private void AddDayIDsToList(int year, int month, int day, long?[] dayNoticeIds) {
             Console.WriteLine("Daily Mode: " + day + "." + month + "." + year + " - " + dayNoticeIds.Length + " Notices");
-            foreach (long id in dayNoticeIds)
-            {
+            foreach (long id in dayNoticeIds) {
                 idList.Add(id);
             }
 
         }
 
 
-        private void addMonthlyIDsToList(int year, int month, long?[] monthNoticeIds)
-        {
+        private void AddMonthlyIDsToList(int year, int month, long?[] monthNoticeIds) {
             Console.WriteLine("Monthly Mode: " + month + "." + year + " - " + monthNoticeIds.Length + " Notices");
-            foreach (long id in monthNoticeIds)
-            {
+            foreach (long id in monthNoticeIds) {
                 idList.Add(id);
             }
         }
 
 
-        private long?[] getMonthlyIds(int year, int month, DateTime endDate) {
+        private long?[] GetMonthlyIds(int year, int month, DateTime endDate) {
 
             DateTime startOfMonth = new DateTime(year, month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
@@ -128,26 +124,45 @@ namespace WindowsFormsApp1
             string endDateFormmatted = endOfMonth.ToString("dd.MM.yyyy");
 
             string searchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-    "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></search>";
+                "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></search>";
             return client.getSearchNoticeList(searchXML);
         }
 
 
-        static void WriteIDsToCsv(List<Int64> list, string filePath)
-        {
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(filePath))
-                {
-                    foreach (var item in list)
-                    {
+        static void WriteIDsToCsv(List<Int64> list, string filePath) {
+            try {
+                using (StreamWriter sw = new StreamWriter(filePath)) {
+                    foreach (var item in list) {
                         sw.WriteLine(item);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
+            } 
+            catch (Exception ex) {
                 Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+
+        private void GrabNoticesFromIDList(object sender, EventArgs e) {
+            string idListFile = "idList.csv";
+
+            if (!File.Exists(idListFile)) {
+                MessageBox.Show("No IDList has been grabbed from the Webserver. Grab the ID List first ;)");
+                return;
+            }
+
+            idList = File.ReadAllLines(idListFile)
+                .Select(line => long.Parse(line.Trim()))
+                .ToList();
+
+            foreach (int id in idList) {
+                string notice = client.getNoticeHtml(idList[id]);
+                Console.WriteLine(notice);
+
+                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(notice);
+
+
+
             }
         }
     }
