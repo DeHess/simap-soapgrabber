@@ -155,15 +155,40 @@ namespace WindowsFormsApp1
                 .ToList();
 
             foreach (int id in idList) {
-                string notice = client.getNoticeHtml(idList[id]);
-                Console.WriteLine(notice);
-
+                string notice = client.getNoticeHtml(id);
                 HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                 doc.LoadHtml(notice);
 
+                string date = getNoticeDate(doc, id);
 
+                
+
+
+
+
+                //var d = doc.DocumentNode.SelectNodes("//h2");
+                //Console.WriteLine(d.Count);
 
             }
+        }
+
+        private string getNoticeDate(HtmlAgilityPack.HtmlDocument doc, long id) {
+            HtmlNode firstDl = doc.DocumentNode.SelectSingleNode("//dl");
+            if (firstDl != null) {
+                string innerHtml = firstDl.InnerHtml;
+                string pattern = @"\b\d{2}\.\d{2}\.\d{4}\b";
+                Match match = Regex.Match(innerHtml, pattern);
+                if (match.Success) {
+                    string firstDate = match.Value;
+                    Console.WriteLine("Date: " + firstDate);
+                    return firstDate;
+                }
+                
+            }
+            else {
+                MessageBox.Show("No d1 Element found in html of " + id + ", no date discovered!");
+            }
+            return "";
         }
     }
 }
