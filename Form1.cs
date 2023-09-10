@@ -19,28 +19,34 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace WindowsFormsApp1
 {
-    public partial class Form1 : Form {
+    public partial class Soapgrabber : Form {
 
-        private const int NOTICELISTLIMIT = 1000;
+        private const int RESULTSLIMIT = 1000;
+        private const string NOTICECODE = "OB01";
+        private const string AWARDCODE = "OB02";
+        private const string NOTICEIDPATH = "NoticeIds.csv";
+        private const string AWARDIDPATH = "AwardIds.csv";
+        private const string NOTICESPATH = "Notices.csv";
+        private const string AWARDSPATH = "Awards.csv";
+
         SoapServerService client = new SoapServerService();
         bool idGatheringFinished = false;
-        List<Int64> idList = new List<Int64>();
+        List<Int64> noticeIdList = new List<Int64>();
+        List<Int64> awardIdList = new List<Int64>();
 
-        public Form1() {
+        public Soapgrabber() {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e) {
+        private void Form1_Load(object sender, EventArgs e) {   }
 
-        }
-
-
-
+       
         private void GrabIDList(object sender, EventArgs e) {
             idGatheringFinished = false;
-            idList = new List<Int64>();
-
-            int startYear = 2000;
+            noticeIdList = new List<Int64>();
+            awardIdList = new List<Int64>();
+            
+            int startYear = 2023;
             DateTime endDate = DateTime.Now.Date;
 
             //Iterate over years between startyear and endYear
@@ -48,39 +54,62 @@ namespace WindowsFormsApp1
             while (!idGatheringFinished) {
                 for (int month = 1; month <= 12; month++) {
                     
-                    long?[] monthNoticeIds = GetMonthlyIds(year, month, endDate);
-                    if (monthNoticeIds.Length < NOTICELISTLIMIT) {
-                        AddMonthlyIDsToList(year, month, monthNoticeIds);
+                    long?[] monthNoticeIds = GetIdsOfMonth(year, month, endDate, NOTICECODE);
+                    long?[] monthAwardIds = GetIdsOfMonth(year, month, endDate, AWARDCODE);
+                    
+                    if (monthNoticeIds.Length < RESULTSLIMIT) {
+                        AddMonthIds(month, year, monthNoticeIds, noticeIdList, NOTICECODE);
                     }
 
-                    if (monthNoticeIds.Length >= NOTICELISTLIMIT) {
-                        int daysInMonth = DateTime.DaysInMonth(year, month);
-                        for (int day = 1; day <= daysInMonth; day++)
-                        {
-                            
-                            long?[] dayNoticeIds = GetDayNoticeIds(year, month, day, endDate);
-                                    
-                            if (dayNoticeIds.Length > NOTICELISTLIMIT) {
-                                //This does not ever occur (6.9.2023)
-                                MessageBox.Show("DATA LOSS: There were more than 1000 Notices during the day of" + day + "." + month + "." + year + "!!!!");
-                            }
-                            AddDayIDsToList(year, month, day, dayNoticeIds);
+                    if (monthAwardIds.Length < RESULTSLIMIT) {
+                        AddMonthIds(month, year, monthAwardIds, awardIdList, AWARDCODE);
+                    }
 
-                            if (idGatheringFinished) { break;}
+                    if (monthNoticeIds.Length >= RESULTSLIMIT) {
+                        int daysInMonth = DateTime.DaysInMonth(year, month);
+                        for (int day = 1; day <= daysInMonth; day++) {                    
+                            long?[] dayNoticeIds = GetIdsOfDay(year, month, day, endDate, NOTICECODE);
+                            AddDayIds(day, month, year, dayNoticeIds, noticeIdList, NOTICECODE);
+                            if (idGatheringFinished) { break; }
                         }
                     }
+
+                    if (monthAwardIds.Length >= RESULTSLIMIT) {
+                        int daysInMonth = DateTime.DaysInMonth(year, month);
+                        for (int day = 1; day <= daysInMonth; day++) {
+                            long?[] dayAwardIds = GetIdsOfDay(year, month, day, endDate, AWARDCODE);
+                            AddDayIds(day, month, year, dayAwardIds, awardIdList, AWARDCODE);
+                            if (idGatheringFinished) { break; }
+                        }
+                    }
+                    Console.WriteLine("===================================");
                     if (idGatheringFinished) { break; }
                 }
                 year++;
             }
-            WriteIDsToCsv(idList, "idList.csv");
-            Console.WriteLine("Data has been written to the CSV file.");
-            MessageBox.Show("All Notice ID's from 01/01/2000 to " + endDate.Day + "/" + endDate.Month + "/" + endDate.Year + " have been written to idList.csv");
+            WriteIDsToCsv(noticeIdList, NOTICEIDPATH);
+            WriteIDsToCsv(awardIdList, AWARDIDPATH);
+            Console.WriteLine("Data has been written to respective CSV files.");
+            MessageBox.Show("All Notice and Award ID's from " + startYear + " to " + endDate.Day + "/" + endDate.Month + "/" + endDate.Year + " have been written to " + NOTICEIDPATH + " and " + AWARDIDPATH);
         }
 
-
-        private long?[] GetDayNoticeIds(int year, int month, int day, DateTime endDate) {
+        private void AddDayIds(int day, int month, int year, long?[] dayIds, List<Int64> results, string code) {
+            Console.WriteLine(code +  ", Daily Mode: " + day + "." + month + "." + year + " - " + dayIds.Length + " Notices/Awards");
+            foreach (long id in dayIds) {
+                results.Add(id);
+            }
             
+        }
+
+        private void AddMonthIds(int month, int year, long?[] monthIds, List<Int64> results, string code) {
+            Console.WriteLine(code + ", Monthly Mode: " + month + "." + year + " - " + monthIds.Length + " Notices/Awards");
+            foreach (long id in monthIds) {
+                results.Add(id);
+            }
+            
+        }
+
+        private long?[] GetIdsOfDay(int year, int month, int day, DateTime endDate, string code) {
             DateTime currentDate = new DateTime(year, month, day);
             if (currentDate == endDate) { 
                 idGatheringFinished = true;
@@ -88,61 +117,93 @@ namespace WindowsFormsApp1
 
             string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
             
-            string dayNoticeXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field><field name=\"TYPE_CD_OB\"><value>OB01</value></field></search>";
+            string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + 
+                "</value></field><field name=\"TYPE_CD_OB\"><value>" + code + "</value></field></search>";
 
-            string dayAwardXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field><field name=\"TYPE_CD_OB\"><value>OB02</value></field></search>";
+            long?[] results = client.getSearchNoticeList(daySearchXML);
 
-            long?[] notices = client.getSearchNoticeList(dayNoticeXML);
-            long?[] awards = client.getSearchNoticeList(dayAwardXML);
-
-            return client.getSearchNoticeList(dayNoticeXML);
-        }
-
-
-        private void AddDayIDsToList(int year, int month, int day, long?[] dayNoticeIds) {
-            Console.WriteLine("Daily Mode: " + day + "." + month + "." + year + " - " + dayNoticeIds.Length + " Notices");
-            foreach (long id in dayNoticeIds) {
-                idList.Add(id);
+            if (results.Length > RESULTSLIMIT) {
+                //DOES NOT EVER OCCUR (20.12.2023)
+                MessageBox.Show("DATA LOSS, More than 1000 Notices/Awards during one single day, some Notices/Awards were lost."); 
             }
 
+            return results;
         }
 
-
-        private void AddMonthlyIDsToList(int year, int month, long?[] monthNoticeIds) {
-            Console.WriteLine("Monthly Mode: " + month + "." + year + " - " + monthNoticeIds.Length + " Notices");
-            foreach (long id in monthNoticeIds) {
-                idList.Add(id);
-            }
-        }
-
-
-        private long?[] GetMonthlyIds(int year, int month, DateTime endDate) {
-
+        private long?[] GetIdsOfMonth(int year, int month, DateTime endDate, string code) {
             DateTime startOfMonth = new DateTime(year, month, 1);
             DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-
             if (endOfMonth >= endDate) {
                 endOfMonth = endDate;
                 idGatheringFinished = true;
             }
-
             string startDateFormatted = startOfMonth.ToString("dd.MM.yyyy");
             string endDateFormmatted = endOfMonth.ToString("dd.MM.yyyy");
 
-            string monthNoticeXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></field><field name=\"TYPE_CD_OB\"><value>OB01</value></field></search>";
+            string monthSearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" 
+                + endDateFormmatted + "</value></field><field name=\"TYPE_CD_OB\"><value>" + code +"</value></field></search>";
 
-            string monthAwardXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></field><field name=\"TYPE_CD_OB\"><value>OB02</value></field></search>";
-
-            long?[] notices = client.getSearchNoticeList(monthNoticeXML);
-            long?[] awards = client.getSearchNoticeList(monthAwardXML);
-
-            return client.getSearchNoticeList(monthNoticeXML);
+            return client.getSearchNoticeList(monthSearchXML);
         }
 
+
+
+  
+        private void GrabNoticesFromIDList(object sender, EventArgs e) {
+           
+            if (!File.Exists(NOTICEIDPATH) || !File.Exists(AWARDIDPATH)) {
+                MessageBox.Show("List of Award and Notice Ids could not be found, Grab the Ids first ;)");
+                return;
+            }
+
+            WriteNoticeDataToCSV(NOTICEIDPATH, NOTICESPATH);
+            //WriteNoticeDataToCSV(AWARDIDPATH, AWARDSPATH);
+        }
+
+        
+        private void WriteNoticeDataToCSV(string sourcePath, string resultPath) {
+            noticeIdList = File.ReadAllLines(sourcePath)
+                .Select(line => long.Parse(line.Trim()))
+                .ToList();
+            
+            try {
+                using (StreamWriter sw = new StreamWriter(resultPath)) {
+                    foreach (long id in noticeIdList) {
+                        string notice = client.getNoticeXml(id);
+                        sw.WriteLine(notice);
+                    }
+                }
+            }
+            catch (Exception ex) {
+                MessageBox.Show("An error occurred: " + ex.Message);
+            }            
+        }
+
+        private void WriteNoticeDataToCSV(string sourcePath, string resultPath)
+        {
+            noticeIdList = File.ReadAllLines(sourcePath)
+                .Select(line => long.Parse(line.Trim()))
+                .ToList();
+
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(resultPath))
+                {
+                    foreach (long id in noticeIdList)
+                    {
+                        string notice = client.getNoticeXml(id);
+                        sw.WriteLine(notice);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred: " + ex.Message);
+            }
+
+        }
 
         static void WriteIDsToCsv(List<Int64> list, string filePath) {
             try {
@@ -151,67 +212,10 @@ namespace WindowsFormsApp1
                         sw.WriteLine(item);
                     }
                 }
-            } 
+            }
             catch (Exception ex) {
                 MessageBox.Show("An error occurred: " + ex.Message);
             }
-        }
-
-        private void GrabNoticesFromIDList(object sender, EventArgs e) {
-            string idListFile = "idList.csv";
-
-            if (!File.Exists(idListFile)) {
-                MessageBox.Show("No IDList has been grabbed from the Webserver. Grab the ID List first ;)");
-                return;
-            }
-
-            idList = File.ReadAllLines(idListFile)
-                .Select(line => long.Parse(line.Trim()))
-                .ToList();
-
-            foreach (int id in idList) {
-                string notice = client.getNoticeHtml(id);
-                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-                doc.LoadHtml(notice);
-                HtmlNodeCollection dlElements = doc.DocumentNode.SelectNodes("//dl");
-                string date = getNoticeDate(dlElements, id);
-                string authority = getNoticeAuthority(dlElements, id);
-                
-
-
-
-
-                //var d = doc.DocumentNode.SelectNodes("//h2");
-                Console.WriteLine("==================================");
-
-            }
-        }
-
-        private string getNoticeAuthority(HtmlNodeCollection dlElements, int id) {
-            HtmlNode authoritydl = dlElements[1];
-            HtmlNodeCollection spans = authoritydl.SelectNodes("//span");
-            HtmlNode authoritySpan = spans[1];
-            string value = authoritySpan.NextSibling.InnerText;
-
-            Console.WriteLine("Authority: " + value);
-            return value;
-        }
-
-        private string getNoticeDate(HtmlNodeCollection dlElements, long id) {
-            HtmlNode dateDl = dlElements[0];
-            
-            string innerHtml = dateDl.InnerHtml;
-            string pattern = @"\b\d{2}\.\d{2}\.\d{4}\b";
-            Match match = Regex.Match(innerHtml, pattern);
-            if (match.Success) {
-                string date = match.Value;
-                Console.WriteLine("Date: " + date);
-                return date;
-            }
-            else {
-                MessageBox.Show("Notice " + id + ": no date discovered!");
-            }
-            return "";
         }
     }
 }
