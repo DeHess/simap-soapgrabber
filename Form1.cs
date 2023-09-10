@@ -87,10 +87,17 @@ namespace WindowsFormsApp1
             }
 
             string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
-            string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field></search>";
+            
+            string dayNoticeXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field><field name=\"TYPE_CD_OB\"><value>OB01</value></field></search>";
 
-            return client.getSearchNoticeList(daySearchXML);
+            string dayAwardXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + "</value></field><field name=\"TYPE_CD_OB\"><value>OB02</value></field></search>";
+
+            long?[] notices = client.getSearchNoticeList(dayNoticeXML);
+            long?[] awards = client.getSearchNoticeList(dayAwardXML);
+
+            return client.getSearchNoticeList(dayNoticeXML);
         }
 
 
@@ -124,9 +131,16 @@ namespace WindowsFormsApp1
             string startDateFormatted = startOfMonth.ToString("dd.MM.yyyy");
             string endDateFormmatted = endOfMonth.ToString("dd.MM.yyyy");
 
-            string searchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
-                "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></search>";
-            return client.getSearchNoticeList(searchXML);
+            string monthNoticeXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></field><field name=\"TYPE_CD_OB\"><value>OB01</value></field></search>";
+
+            string monthAwardXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
+                "<field name=\"STAT_TM_1\"><value>" + startDateFormatted + "</value></field><field name=\"STAT_TM_2\"><value>" + endDateFormmatted + "</value></field></field><field name=\"TYPE_CD_OB\"><value>OB02</value></field></search>";
+
+            long?[] notices = client.getSearchNoticeList(monthNoticeXML);
+            long?[] awards = client.getSearchNoticeList(monthAwardXML);
+
+            return client.getSearchNoticeList(monthNoticeXML);
         }
 
 
