@@ -157,9 +157,9 @@ namespace WindowsFormsApp1
                 MessageBox.Show("List of Award and Notice Ids could not be found, Grab the Ids first ;)");
                 return;
             }
-
+            WriteAwardDataToCSV(AWARDIDPATH, AWARDSPATH);
             WriteNoticeDataToCSV(NOTICEIDPATH, NOTICESPATH);
-            //WriteNoticeDataToCSV(AWARDIDPATH, AWARDSPATH);
+            
         }
 
         
@@ -181,20 +181,49 @@ namespace WindowsFormsApp1
             }            
         }
 
-        private void WriteNoticeDataToCSV(string sourcePath, string resultPath)
+        private void WriteAwardDataToCSV(string sourcePath, string resultPath)
         {
-            noticeIdList = File.ReadAllLines(sourcePath)
+            awardIdList = File.ReadAllLines(sourcePath)
                 .Select(line => long.Parse(line.Trim()))
                 .ToList();
 
+            string t1 = client.getNoticeHtml(1305785);
+            string t2 = client.getNoticeXml(1362465);
+            
+           
             try
             {
                 using (StreamWriter sw = new StreamWriter(resultPath))
                 {
-                    foreach (long id in noticeIdList)
+                    foreach (long id in awardIdList)
                     {
-                        string notice = client.getNoticeXml(id);
-                        sw.WriteLine(notice);
+                        string noticeHTML = client.getNoticeHtml(id);
+                        string pattern = @"NOTICE_NR=(\d+)\b";
+                        Match match = Regex.Match(noticeHTML, pattern);
+
+                        if (match.Success)
+                        {
+
+                            string numberString = match.Groups[1].Value;
+
+                            int number;
+
+
+
+                            if (int.TryParse(numberString, out number))
+                            {
+                                Console.WriteLine("Extracted Notice Number: " + number);
+                                Console.WriteLine("========================");
+                            }
+
+
+                            string noticeXML = client.getNoticeXml(id);
+                            sw.WriteLine(noticeXML);
+                        }
+                        else {
+                            Console.WriteLine("YO WTFFF: " + id);
+                            Console.WriteLine("========================");
+                        }
                     }
                 }
             }
