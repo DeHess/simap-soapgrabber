@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using WindowsFormsApp1.ch.simap.www;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using HtmlAgilityPack;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
+using System.Xml;
 
-
-namespace WindowsFormsApp1
-{
+namespace WindowsFormsApp1 {
     public partial class Soapgrabber : Form {
 
         private const int RESULTSLIMIT = 1000;
@@ -39,14 +29,17 @@ namespace WindowsFormsApp1
         }
 
         private void Form1_Load(object sender, EventArgs e) {   }
-
        
         private void GrabIDList(object sender, EventArgs e) {
+            Console.WriteLine("==================================================");
+            Console.WriteLine("Gathering Notice and Award IDs");
+            Console.WriteLine("==================================================");
+
             idGatheringFinished = false;
             noticeIdList = new List<Int64>();
             awardIdList = new List<Int64>();
             
-            int startYear = 2023;
+            int startYear = 2000;
             DateTime endDate = DateTime.Now.Date;
 
             //Iterate over years between startyear and endYear
@@ -90,7 +83,9 @@ namespace WindowsFormsApp1
             WriteIDsToCsv(noticeIdList, NOTICEIDPATH);
             WriteIDsToCsv(awardIdList, AWARDIDPATH);
             Console.WriteLine("Data has been written to respective CSV files.");
-            MessageBox.Show("All Notice and Award ID's from " + startYear + " to " + endDate.Day + "/" + endDate.Month + "/" + endDate.Year + " have been written to " + NOTICEIDPATH + " and " + AWARDIDPATH);
+            MessageBox.Show("All Notice and Award ID's from " + startYear + " to " + 
+                endDate.Day + "/" + endDate.Month + "/" + endDate.Year + " have been written to " + 
+                NOTICEIDPATH + " and " + AWARDIDPATH);
         }
 
         private void AddDayIds(int day, int month, int year, long?[] dayIds, List<Int64> results, string code) {
@@ -114,9 +109,7 @@ namespace WindowsFormsApp1
             if (currentDate == endDate) { 
                 idGatheringFinished = true;
             }
-
             string currentDateFormatted = currentDate.ToString("dd.MM.yyyy");
-            
             string daySearchXML = "<search pageNo=\"1\" recordsPerPage=\"-1\">" +
                 "<field name=\"STAT_TM_1\"><value>" + currentDateFormatted + 
                 "</value></field><field name=\"TYPE_CD_OB\"><value>" + code + "</value></field></search>";
@@ -124,7 +117,7 @@ namespace WindowsFormsApp1
             long?[] results = client.getSearchNoticeList(daySearchXML);
 
             if (results.Length > RESULTSLIMIT) {
-                //DOES NOT EVER OCCUR (20.12.2023)
+                //As of 20.12.2023, this does not ever occur. Furthemore, it is very unlikely that it ever will in the future.
                 MessageBox.Show("DATA LOSS, More than 1000 Notices/Awards during one single day, some Notices/Awards were lost."); 
             }
 
@@ -148,9 +141,23 @@ namespace WindowsFormsApp1
             return client.getSearchNoticeList(monthSearchXML);
         }
 
+        private void WriteIDsToCsv(List<Int64> list, string filePath) {
+            try {
+                using (StreamWriter sw = new StreamWriter(filePath)) {
+                    foreach (var item in list) {
+                        sw.WriteLine(item);
+                    }
+                }
+            }
+            catch (Exception ex) {
+                MessageBox.Show("An error occurred: " + ex.Message);
+            }
+        }
 
 
-  
+
+
+
         private void GrabNoticesFromIDList(object sender, EventArgs e) {
            
             if (!File.Exists(NOTICEIDPATH) || !File.Exists(AWARDIDPATH)) {
@@ -159,11 +166,12 @@ namespace WindowsFormsApp1
             }
             WriteAwardDataToCSV(AWARDIDPATH, AWARDSPATH);
             WriteNoticeDataToCSV(NOTICEIDPATH, NOTICESPATH);
-            
         }
 
-        
         private void WriteNoticeDataToCSV(string sourcePath, string resultPath) {
+            Console.WriteLine("==================================================");
+            Console.WriteLine("Writing Notice Data To CSV");
+            Console.WriteLine("==================================================");
             noticeIdList = File.ReadAllLines(sourcePath)
                 .Select(line => long.Parse(line.Trim()))
                 .ToList();
@@ -181,70 +189,61 @@ namespace WindowsFormsApp1
             }            
         }
 
-        private void WriteAwardDataToCSV(string sourcePath, string resultPath)
-        {
+        private void WriteAwardDataToCSV(string sourcePath, string resultPath) {
+            Console.WriteLine("==================================================");
+            Console.WriteLine("Writing Award Data To CSV");
+            Console.WriteLine("==================================================");
+            
             awardIdList = File.ReadAllLines(sourcePath)
                 .Select(line => long.Parse(line.Trim()))
                 .ToList();
 
-            string t1 = client.getNoticeHtml(1305785);
-            string t2 = client.getNoticeXml(1362465);
-            
-           
-            try
-            {
-                using (StreamWriter sw = new StreamWriter(resultPath))
-                {
-                    foreach (long id in awardIdList)
-                    {
+            try {
+                using (StreamWriter sw = new StreamWriter(resultPath)) {
+                    foreach (long id in awardIdList) {
+                        string awardXML = client.getNoticeXml(id);
+
                         string noticeHTML = client.getNoticeHtml(id);
                         string pattern = @"NOTICE_NR=(\d+)\b";
                         Match match = Regex.Match(noticeHTML, pattern);
 
-                        if (match.Success)
-                        {
 
+                        if (match.Success) {
                             string numberString = match.Groups[1].Value;
+                            int noticeNr;
 
-                            int number;
+                            int.TryParse(numberString, out noticeNr);
+                                
+                            Console.WriteLine("Notice Number for Award "+ id + ": " + noticeNr);
+                            Console.WriteLine("========================");
 
+                            awardXML = AddNoticeNrToXML(awardXML, noticeNr);
 
-
-                            if (int.TryParse(numberString, out number))
-                            {
-                                Console.WriteLine("Extracted Notice Number: " + number);
-                                Console.WriteLine("========================");
-                            }
-
-
-                            string noticeXML = client.getNoticeXml(id);
-                            sw.WriteLine(noticeXML);
+                            sw.WriteLine(awardXML);
                         }
                         else {
-                            Console.WriteLine("YO WTFFF: " + id);
+                            Console.WriteLine("Notice Number not found for Award: " + id);
                             Console.WriteLine("========================");
+                            sw.WriteLine(awardXML);
                         }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error occurred: " + ex.Message);
-            }
-
-        }
-
-        static void WriteIDsToCsv(List<Int64> list, string filePath) {
-            try {
-                using (StreamWriter sw = new StreamWriter(filePath)) {
-                    foreach (var item in list) {
-                        sw.WriteLine(item);
                     }
                 }
             }
             catch (Exception ex) {
                 MessageBox.Show("An error occurred: " + ex.Message);
             }
+
+        }
+
+        private string AddNoticeNrToXML(string noticeXML, int noticeNr) {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(noticeXML);
+            XmlElement noticeIdElement = xmlDoc.CreateElement("NOTICE_ID");
+            noticeIdElement.InnerText = noticeNr.ToString();
+
+            XmlNode formNode = xmlDoc.SelectSingleNode("/FORM");
+            formNode.AppendChild(noticeIdElement);
+            return xmlDoc.OuterXml;
         }
     }
 }
