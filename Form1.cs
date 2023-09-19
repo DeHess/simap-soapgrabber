@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using WindowsFormsApp1.ch.simap.www;
 using System.Text.RegularExpressions;
 using System.Xml;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WindowsFormsApp1 {
     public partial class Soapgrabber : Form {
@@ -14,16 +15,20 @@ namespace WindowsFormsApp1 {
         private const int RESULTSLIMIT = 1000;
         private const string NOTICECODE = "OB01";
         private const string AWARDCODE = "OB02";
-        private const string NOTICEIDPATH = "NoticeIds.csv";
-        private const string AWARDIDPATH = "AwardIds.csv";
-        private const string NOTICESPATH = "Notices.csv";
-        private const string AWARDSPATH = "Awards.csv";
+        private const string DEFAULTPATH = "C:/Soapgrabber/";
+
+      
 
         SoapServerService client = new SoapServerService();
         bool idGatheringFinished = false;
         List<Int64> noticeIdList = new List<Int64>();
         List<Int64> awardIdList = new List<Int64>();
-
+        string outputDirectory = DEFAULTPATH;
+        private string noticeIdPath = DEFAULTPATH + "\\NoticeIds.csv";
+        private string awardIdPath = DEFAULTPATH + "\\AwardIds.csv";
+        private string NoticesPath = DEFAULTPATH + "\\Notices.csv";
+        private string AwardsPath = DEFAULTPATH + "\\Awards.csv";
+        
         public Soapgrabber() {
             InitializeComponent();
         }
@@ -31,15 +36,19 @@ namespace WindowsFormsApp1 {
         private void Form1_Load(object sender, EventArgs e) {   }
        
         private void GrabIDList(object sender, EventArgs e) {
-            Console.WriteLine("==================================================");
-            Console.WriteLine("Gathering Notice and Award IDs");
-            Console.WriteLine("==================================================");
+            if (! Directory.Exists(outputDirectory)) {
+                MessageBox.Show("The Output Directory does not exist. Aborting.");
+                return;
+            }
+            consoleOutput.AppendText("==================================================\n");
+            consoleOutput.AppendText("Gathering Notice and Award IDs\n");
+            consoleOutput.AppendText("==================================================\n");
 
             idGatheringFinished = false;
             noticeIdList = new List<Int64>();
             awardIdList = new List<Int64>();
             
-            int startYear = 2000;
+            int startYear = 2023;
             DateTime endDate = DateTime.Now.Date;
 
             //Iterate over years between startyear and endYear
@@ -75,21 +84,26 @@ namespace WindowsFormsApp1 {
                             if (idGatheringFinished) { break; }
                         }
                     }
-                    Console.WriteLine("===================================");
+                    consoleOutput.AppendText("===================================\n");
                     if (idGatheringFinished) { break; }
                 }
                 year++;
             }
-            WriteIDsToCsv(noticeIdList, NOTICEIDPATH);
-            WriteIDsToCsv(awardIdList, AWARDIDPATH);
-            Console.WriteLine("Data has been written to respective CSV files.");
+            WriteIDsToCsv(noticeIdList, noticeIdPath);
+            WriteIDsToCsv(awardIdList, awardIdPath);
+            consoleOutput.AppendText("Data has been written to respective CSV files.\n");
             MessageBox.Show("All Notice and Award ID's from " + startYear + " to " + 
                 endDate.Day + "/" + endDate.Month + "/" + endDate.Year + " have been written to " + 
-                NOTICEIDPATH + " and " + AWARDIDPATH);
+                noticeIdPath + " and " + awardIdPath);
         }
 
         private void AddDayIds(int day, int month, int year, long?[] dayIds, List<Int64> results, string code) {
-            Console.WriteLine(code +  ", Daily Mode: " + day + "." + month + "." + year + " - " + dayIds.Length + " Notices/Awards");
+            if (code == NOTICECODE) {
+                consoleOutput.AppendText("Daily Mode: " + day + "." + month + "." + year + " - " + dayIds.Length + " Notices\n");
+            }
+            if (code == AWARDCODE) {
+                consoleOutput.AppendText("Daily Mode: " + day + "." + month + "." + year + " - " + dayIds.Length + " Awards\n");
+            }
             foreach (long id in dayIds) {
                 results.Add(id);
             }
@@ -97,7 +111,12 @@ namespace WindowsFormsApp1 {
         }
 
         private void AddMonthIds(int month, int year, long?[] monthIds, List<Int64> results, string code) {
-            Console.WriteLine(code + ", Monthly Mode: " + month + "." + year + " - " + monthIds.Length + " Notices/Awards");
+            if (code == NOTICECODE) {
+                consoleOutput.AppendText("Monthly Mode: " + month + "." + year + " - " + monthIds.Length + " Notices\n");
+            }
+            if (code == AWARDCODE) {
+                consoleOutput.AppendText("Monthly Mode: " + month + "." + year + " - " + monthIds.Length + " Awards\n");
+            }
             foreach (long id in monthIds) {
                 results.Add(id);
             }
@@ -159,19 +178,24 @@ namespace WindowsFormsApp1 {
 
 
         private void GrabNoticesFromIDList(object sender, EventArgs e) {
-           
-            if (!File.Exists(NOTICEIDPATH) || !File.Exists(AWARDIDPATH)) {
+
+            if (!Directory.Exists(outputDirectory)) {
+                MessageBox.Show("The Output Directory does not exist. Aborting.");
+                return;
+            }
+
+            if (!File.Exists(noticeIdPath) || !File.Exists(awardIdPath)) {
                 MessageBox.Show("List of Award and Notice Ids could not be found, Grab the Ids first ;)");
                 return;
             }
-            WriteAwardDataToCSV(AWARDIDPATH, AWARDSPATH);
-            WriteNoticeDataToCSV(NOTICEIDPATH, NOTICESPATH);
+            WriteAwardDataToCSV(awardIdPath, AwardsPath);
+            WriteNoticeDataToCSV(noticeIdPath, NoticesPath);
         }
 
         private void WriteNoticeDataToCSV(string sourcePath, string resultPath) {
-            Console.WriteLine("==================================================");
-            Console.WriteLine("Writing Notice Data To CSV");
-            Console.WriteLine("==================================================");
+            consoleOutput.AppendText("==================================================\n");
+            consoleOutput.AppendText("Writing Notice Data To CSV\n");
+            consoleOutput.AppendText("==================================================\n");
             noticeIdList = File.ReadAllLines(sourcePath)
                 .Select(line => long.Parse(line.Trim()))
                 .ToList();
@@ -185,14 +209,14 @@ namespace WindowsFormsApp1 {
                 }
             }
             catch (Exception ex) {
-                MessageBox.Show("An error occurred: " + ex.Message);
+                MessageBox.Show("An error occurred while trying to write to a file: " + ex.Message);
             }            
         }
 
         private void WriteAwardDataToCSV(string sourcePath, string resultPath) {
-            Console.WriteLine("==================================================");
-            Console.WriteLine("Writing Award Data To CSV");
-            Console.WriteLine("==================================================");
+            consoleOutput.AppendText("==================================================\n");
+            consoleOutput.AppendText("Writing Award Data To CSV\n");
+            consoleOutput.AppendText("==================================================\n");
             
             awardIdList = File.ReadAllLines(sourcePath)
                 .Select(line => long.Parse(line.Trim()))
@@ -214,16 +238,16 @@ namespace WindowsFormsApp1 {
 
                             int.TryParse(numberString, out noticeNr);
                                 
-                            Console.WriteLine("Notice Number for Award "+ id + ": " + noticeNr);
-                            Console.WriteLine("========================");
+                            consoleOutput.AppendText("Notice Number for Award "+ id + ": " + noticeNr + "\n");
+                            consoleOutput.AppendText("========================\n");
 
                             awardXML = AddNoticeNrToXML(awardXML, noticeNr);
 
                             sw.WriteLine(awardXML);
                         }
                         else {
-                            Console.WriteLine("Notice Number not found for Award: " + id);
-                            Console.WriteLine("========================");
+                            consoleOutput.AppendText("Notice Number not found for Award: " + id + "\n");
+                            consoleOutput.AppendText("========================\n");
                             sw.WriteLine(awardXML);
                         }
                     }
@@ -244,6 +268,38 @@ namespace WindowsFormsApp1 {
             XmlNode formNode = xmlDoc.SelectSingleNode("/FORM");
             formNode.AppendChild(noticeIdElement);
             return xmlDoc.OuterXml;
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e) {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)   {
+            string givenPath = maskedTextBox1.Text;
+            if (!Directory.Exists(givenPath)) {
+                MessageBox.Show("The given Directory does not exist.");
+                return;
+            }
+            outputDirectory = givenPath;
+            noticeIdPath = outputDirectory + "\\NoticeIds.csv";
+            awardIdPath = outputDirectory + "\\AwardIds.csv";
+            NoticesPath = outputDirectory + "\\Notices.csv";
+            AwardsPath = outputDirectory + "\\Awards.csv";
+
+            consoleOutput.AppendText("==================================================\n");
+            consoleOutput.AppendText("Output Directory has been changed to: " + givenPath + "\n");
+            consoleOutput.AppendText("==================================================\n");
+
+            MessageBox.Show("Output Directory has been changed to: " + givenPath);
+        }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)    {
+
         }
     }
 }

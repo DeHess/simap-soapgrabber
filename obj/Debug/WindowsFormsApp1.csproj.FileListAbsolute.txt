@@ -38,3 +38,7 @@ C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\bin\Debug\HtmlAgility
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\bin\Debug\HtmlAgilityPack.xml
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.Soapgrabber.resources
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.csproj.CopyComplete
+C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\bin\Debug\WindowsFormsApp1.exe.manifest
+C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\bin\Debug\WindowsFormsApp1.application
+C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.exe.manifest
+C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.application
