@@ -32,7 +32,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.button2 = new System.Windows.Forms.Button();
-            this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
+            this.filepathInput = new System.Windows.Forms.MaskedTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.consoleOutput = new System.Windows.Forms.RichTextBox();
@@ -65,13 +65,13 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.GrabNoticesFromIDList);
             // 
-            // maskedTextBox1
+            // filepathInput
             // 
-            this.maskedTextBox1.Location = new System.Drawing.Point(12, 25);
-            this.maskedTextBox1.Name = "maskedTextBox1";
-            this.maskedTextBox1.Size = new System.Drawing.Size(307, 20);
-            this.maskedTextBox1.TabIndex = 2;
-            this.maskedTextBox1.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox1_MaskInputRejected);
+            this.filepathInput.Location = new System.Drawing.Point(12, 25);
+            this.filepathInput.Name = "filepathInput";
+            this.filepathInput.Size = new System.Drawing.Size(307, 20);
+            this.filepathInput.TabIndex = 2;
+            this.filepathInput.MaskInputRejected += new System.Windows.Forms.MaskInputRejectedEventHandler(this.maskedTextBox1_MaskInputRejected);
             // 
             // label1
             // 
@@ -91,7 +91,7 @@
             this.button3.TabIndex = 4;
             this.button3.Text = "Submit Path";
             this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.button3.Click += new System.EventHandler(this.SubmitNewFilePath);
             // 
             // consoleOutput
             // 
@@ -110,7 +110,7 @@
             this.Controls.Add(this.consoleOutput);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.maskedTextBox1);
+            this.Controls.Add(this.filepathInput);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Name = "Soapgrabber";
@@ -126,7 +126,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.MaskedTextBox maskedTextBox1;
+        private System.Windows.Forms.MaskedTextBox filepathInput;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.RichTextBox consoleOutput;

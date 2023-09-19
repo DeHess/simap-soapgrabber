@@ -15,7 +15,7 @@ namespace WindowsFormsApp1 {
         private const int RESULTSLIMIT = 1000;
         private const string NOTICECODE = "OB01";
         private const string AWARDCODE = "OB02";
-        private const string DEFAULTPATH = "C:/Soapgrabber/";
+        private const string DEFAULTPATH = "C:\\Soapgrabber";
 
       
 
@@ -270,17 +270,8 @@ namespace WindowsFormsApp1 {
             return xmlDoc.OuterXml;
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e) {
-
-        }
-
-        private void button3_Click(object sender, EventArgs e)   {
-            string givenPath = maskedTextBox1.Text;
+        private void SubmitNewFilePath(object sender, EventArgs e)   {
+            string givenPath = filepathInput.Text;
             if (!Directory.Exists(givenPath)) {
                 MessageBox.Show("The given Directory does not exist.");
                 return;
@@ -299,6 +290,16 @@ namespace WindowsFormsApp1 {
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)    {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void maskedTextBox1_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
+        {
 
         }
     }
