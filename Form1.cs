@@ -26,8 +26,8 @@ namespace WindowsFormsApp1 {
         string outputDirectory = DEFAULTPATH;
         private string noticeIdPath = DEFAULTPATH + "\\NoticeIds.csv";
         private string awardIdPath = DEFAULTPATH + "\\AwardIds.csv";
-        private string NoticesPath = DEFAULTPATH + "\\Notices.csv";
-        private string AwardsPath = DEFAULTPATH + "\\Awards.csv";
+        private string NoticesPath = DEFAULTPATH + "\\Notices.xml";
+        private string AwardsPath = DEFAULTPATH + "\\Awards.xml";
         
         public Soapgrabber() {
             InitializeComponent();
@@ -136,7 +136,7 @@ namespace WindowsFormsApp1 {
             long?[] results = client.getSearchNoticeList(daySearchXML);
 
             if (results.Length > RESULTSLIMIT) {
-                //As of 20.12.2023, this does not ever occur. Furthemore, it is very unlikely that it ever will in the future.
+                //As of 20.12.2023, this does not ever occur. It is very unlikely that it ever will in the future.
                 MessageBox.Show("DATA LOSS, More than 1000 Notices/Awards during one single day, some Notices/Awards were lost."); 
             }
 
@@ -188,11 +188,11 @@ namespace WindowsFormsApp1 {
                 MessageBox.Show("List of Award and Notice Ids could not be found, Grab the Ids first ;)");
                 return;
             }
-            WriteAwardDataToCSV(awardIdPath, AwardsPath);
-            WriteNoticeDataToCSV(noticeIdPath, NoticesPath);
+            WriteAwardDataToFile(awardIdPath, AwardsPath);
+            WriteNoticeDataToFile(noticeIdPath, NoticesPath);
         }
 
-        private void WriteNoticeDataToCSV(string sourcePath, string resultPath) {
+        private void WriteNoticeDataToFile(string sourcePath, string resultPath) {
             consoleOutput.AppendText("==================================================\n");
             consoleOutput.AppendText("Writing Notice Data To CSV\n");
             consoleOutput.AppendText("==================================================\n");
@@ -202,10 +202,22 @@ namespace WindowsFormsApp1 {
             
             try {
                 using (StreamWriter sw = new StreamWriter(resultPath)) {
+                    sw.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                    sw.WriteLine("<!DOCTYPE FORM SYSTEM \"form.dtd\"[ <!ENTITY % OB01 \"INCLUDE\"> ]>");
+                    sw.WriteLine("<documents>");
                     foreach (long id in noticeIdList) {
                         string notice = client.getNoticeXml(id);
-                        sw.WriteLine(notice);
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(notice);
+
+                        // Remove the XML declaration node (first child) and DOCTYPE node (second child)
+                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
+                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
+                        
+                        string cleanedXml = xmlDoc.OuterXml;
+                        sw.WriteLine(cleanedXml);
                     }
+                    sw.WriteLine("</documents>");
                 }
             }
             catch (Exception ex) {
@@ -213,7 +225,7 @@ namespace WindowsFormsApp1 {
             }            
         }
 
-        private void WriteAwardDataToCSV(string sourcePath, string resultPath) {
+        private void WriteAwardDataToFile(string sourcePath, string resultPath) {
             consoleOutput.AppendText("==================================================\n");
             consoleOutput.AppendText("Writing Award Data To CSV\n");
             consoleOutput.AppendText("==================================================\n");
@@ -224,33 +236,42 @@ namespace WindowsFormsApp1 {
 
             try {
                 using (StreamWriter sw = new StreamWriter(resultPath)) {
+                    sw.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); 
+                    sw.WriteLine("<!DOCTYPE FORM SYSTEM \"form.dtd\"[ <!ENTITY % OB02 \"INCLUDE\"> ]>");
+                    sw.WriteLine("<documents>");
                     foreach (long id in awardIdList) {
                         string awardXML = client.getNoticeXml(id);
+
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(awardXML);
+
+                        // Remove the XML declaration node (first child) and DOCTYPE node (second child)
+                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
+                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
 
                         string noticeHTML = client.getNoticeHtml(id);
                         string pattern = @"NOTICE_NR=(\d+)\b";
                         Match match = Regex.Match(noticeHTML, pattern);
-
 
                         if (match.Success) {
                             string numberString = match.Groups[1].Value;
                             int noticeNr;
 
                             int.TryParse(numberString, out noticeNr);
-                                
+                 
                             consoleOutput.AppendText("Notice Number for Award "+ id + ": " + noticeNr + "\n");
                             consoleOutput.AppendText("========================\n");
-
-                            awardXML = AddNoticeNrToXML(awardXML, noticeNr);
-
+                            awardXML = AddNoticeNrToXML(xmlDoc, noticeNr);
                             sw.WriteLine(awardXML);
                         }
                         else {
                             consoleOutput.AppendText("Notice Number not found for Award: " + id + "\n");
                             consoleOutput.AppendText("========================\n");
+                            awardXML = xmlDoc.OuterXml;
                             sw.WriteLine(awardXML);
                         }
                     }
+                    sw.WriteLine("</documents>");
                 }
             }
             catch (Exception ex) {
@@ -259,9 +280,7 @@ namespace WindowsFormsApp1 {
 
         }
 
-        private string AddNoticeNrToXML(string noticeXML, int noticeNr) {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(noticeXML);
+        private string AddNoticeNrToXML(XmlDocument xmlDoc, int noticeNr) {
             XmlElement noticeIdElement = xmlDoc.CreateElement("NOTICE_ID");
             noticeIdElement.InnerText = noticeNr.ToString();
 
@@ -279,8 +298,8 @@ namespace WindowsFormsApp1 {
             outputDirectory = givenPath;
             noticeIdPath = outputDirectory + "\\NoticeIds.csv";
             awardIdPath = outputDirectory + "\\AwardIds.csv";
-            NoticesPath = outputDirectory + "\\Notices.csv";
-            AwardsPath = outputDirectory + "\\Awards.csv";
+            NoticesPath = outputDirectory + "\\Notices.xml";
+            AwardsPath = outputDirectory + "\\Awards.xml";
 
             consoleOutput.AppendText("==================================================\n");
             consoleOutput.AppendText("Output Directory has been changed to: " + givenPath + "\n");

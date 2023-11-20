@@ -42,3 +42,7 @@ C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\bin\Debug\WindowsForm
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\bin\Debug\WindowsFormsApp1.application
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.exe.manifest
 C:\Users\nathh\OneDrive\Dokumente\GitHub\simap-soapgrabber\obj\Debug\WindowsFormsApp1.application
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\bin\Debug\WindowsFormsApp1.exe.manifest
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\bin\Debug\WindowsFormsApp1.application
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.exe.manifest
+C:\Users\nathh\OneDrive\Desktop\Github\simap-soapgrabber\obj\Debug\WindowsFormsApp1.application
