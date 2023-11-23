@@ -8,6 +8,7 @@ using WindowsFormsApp1.ch.simap.www;
 using System.Text.RegularExpressions;
 using System.Xml;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Threading;
 
 namespace WindowsFormsApp1 {
     public partial class Soapgrabber : Form {
@@ -28,7 +29,10 @@ namespace WindowsFormsApp1 {
         private string awardIdPath = DEFAULTPATH + "\\AwardIds.csv";
         private string NoticesPath = DEFAULTPATH + "\\Notices.xml";
         private string AwardsPath = DEFAULTPATH + "\\Awards.xml";
-        
+        List<Int64> failedNoticeIdList = new List<Int64>();
+        List<Int64> failedAwardIdList = new List<Int64>();
+
+
         public Soapgrabber() {
             InitializeComponent();
         }
@@ -190,6 +194,7 @@ namespace WindowsFormsApp1 {
             }
             WriteAwardDataToFile(awardIdPath, AwardsPath);
             WriteNoticeDataToFile(noticeIdPath, NoticesPath);
+            MessageBox.Show("Run complete: Failed Notices: " + failedNoticeIdList.ToString() + "Failed Awards: " + failedAwardIdList.ToString());
         }
 
         private void WriteNoticeDataToFile(string sourcePath, string resultPath) {
@@ -206,18 +211,37 @@ namespace WindowsFormsApp1 {
                     sw.WriteLine("<!DOCTYPE FORM SYSTEM \"form.dtd\"[ <!ENTITY % OB01 \"INCLUDE\"> ]>");
                     sw.WriteLine("<documents>");
                     foreach (long id in noticeIdList) {
-                        string notice = client.getNoticeXml(id);
-                        XmlDocument xmlDoc = new XmlDocument();
-                        xmlDoc.LoadXml(notice);
 
-                        // Remove the XML declaration node (first child) and DOCTYPE node (second child)
-                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
-                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
-                        
-                        string cleanedXml = xmlDoc.OuterXml;
-                        sw.WriteLine(cleanedXml);
+                        try
+                        {
+
+                            string notice = client.getNoticeXml(id);
+                            XmlDocument xmlDoc = new XmlDocument();
+                            xmlDoc.LoadXml(notice);
+
+                            // Remove the XML declaration node (first child) and DOCTYPE node (second child)
+                            xmlDoc.RemoveChild(xmlDoc.FirstChild);
+                            xmlDoc.RemoveChild(xmlDoc.FirstChild);
+
+                            string cleanedXml = xmlDoc.OuterXml;
+                            sw.WriteLine(cleanedXml);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            failedNoticeIdList.Append(id);
+                        }
+
+
                     }
+
+
+
+
+
                     sw.WriteLine("</documents>");
+
+
                 }
             }
             catch (Exception ex) {
@@ -240,42 +264,54 @@ namespace WindowsFormsApp1 {
                     sw.WriteLine("<!DOCTYPE FORM SYSTEM \"form.dtd\"[ <!ENTITY % OB02 \"INCLUDE\"> ]>");
                     sw.WriteLine("<documents>");
                     foreach (long id in awardIdList) {
-                        string awardXML = client.getNoticeXml(id);
 
-                        XmlDocument xmlDoc = new XmlDocument();
-                        xmlDoc.LoadXml(awardXML);
+                        try
+                        {
 
-                        // Remove the XML declaration node (first child) and DOCTYPE node (second child)
-                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
-                        xmlDoc.RemoveChild(xmlDoc.FirstChild);
+                            string awardXML = client.getNoticeXml(id);
 
-                        string noticeHTML = client.getNoticeHtml(id);
-                        string pattern = @"NOTICE_NR=(\d+)\b";
-                        Match match = Regex.Match(noticeHTML, pattern);
+                            XmlDocument xmlDoc = new XmlDocument();
+                            xmlDoc.LoadXml(awardXML);
 
-                        if (match.Success) {
-                            string numberString = match.Groups[1].Value;
-                            int noticeNr;
+                            // Remove the XML declaration node (first child) and DOCTYPE node (second child)
+                            xmlDoc.RemoveChild(xmlDoc.FirstChild);
+                            xmlDoc.RemoveChild(xmlDoc.FirstChild);
 
-                            int.TryParse(numberString, out noticeNr);
-                 
-                            consoleOutput.AppendText("Notice Number for Award "+ id + ": " + noticeNr + "\n");
-                            consoleOutput.AppendText("========================\n");
-                            awardXML = AddNoticeNrToXML(xmlDoc, noticeNr);
-                            sw.WriteLine(awardXML);
+                            string noticeHTML = client.getNoticeHtml(id);
+                            string pattern = @"NOTICE_NR=(\d+)\b";
+                            Match match = Regex.Match(noticeHTML, pattern);
+
+                            if (match.Success)
+                            {
+                                string numberString = match.Groups[1].Value;
+                                int noticeNr;
+
+                                int.TryParse(numberString, out noticeNr);
+
+                                consoleOutput.AppendText("Notice Number for Award " + id + ": " + noticeNr + "\n");
+                                consoleOutput.AppendText("========================\n");
+                                awardXML = AddNoticeNrToXML(xmlDoc, noticeNr);
+                                sw.WriteLine(awardXML);
+                            }
+                            else
+                            {
+                                consoleOutput.AppendText("Notice Number not found for Award: " + id + "\n");
+                                consoleOutput.AppendText("========================\n");
+                                awardXML = xmlDoc.OuterXml;
+                                sw.WriteLine(awardXML);
+                            }
                         }
-                        else {
-                            consoleOutput.AppendText("Notice Number not found for Award: " + id + "\n");
-                            consoleOutput.AppendText("========================\n");
-                            awardXML = xmlDoc.OuterXml;
-                            sw.WriteLine(awardXML);
+                        catch (Exception ex)
+                        {
+                            failedAwardIdList.Append(id);
                         }
+
                     }
                     sw.WriteLine("</documents>");
                 }
             }
             catch (Exception ex) {
-                MessageBox.Show("An error occurred: " + ex.Message);
+                MessageBox.Show("A file error occurred: " + ex.Message);
             }
 
         }
