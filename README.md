@@ -28,4 +28,4 @@ Now you can create your client in your code and make the first calls
 
 
 
-As of June 2024 The Simap API has been updated. This code wwill not work anymore-
+As of June 2024 The Simap API has been updated. This code will not work anymore-
