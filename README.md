@@ -1,10 +1,14 @@
 # simap-soapgrabber
-This is a little #C application that uses the simap Webserver / API to get data from the swiss public procurement platform [SIMAP](https://simap.ch/shabforms/COMMON/application/applicationGrid.jsp?template=1&view=1&page=/MULTILANGUAGE/simap/content/start.jsp&language=EN{:target="_blank"})
+This is a little #C application that uses the simap Webserver / API to get data from the swiss public procurement platform [SIMAP](https://simap.ch/shabforms/COMMON/application/applicationGrid.jsp?template=1&view=1&page=/MULTILANGUAGE/simap/content/start.jsp&language=EN{:target="_blank"}) using wsdl and soap
+
+<img width="756" height="398" alt="Screenshot" src="https://github.com/user-attachments/assets/969355cb-70f2-4637-8d9d-d9d5c36b1e45" />
+
 
 # Soap Setup Guide
 For others of my generation who have the honor of working with soap and who have to generate classes through wsdl, this is how I managed to make it work:
 
 Step 1:
+
 Use .NET (Java doesn't support wsdl anymore. To use this old feature you'd have to use and old sdk.) 
 
 Step 2:
